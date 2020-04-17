@@ -1,4 +1,6 @@
 # Build and Run
-`dotnet restore`
-`dotnet build`
-`dotnet run`
+RUN `dotnet restore`
+
+RUN `dotnet build`
+
+RUN `dotnet run`
