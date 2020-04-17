@@ -50,21 +50,25 @@ namespace Crawl_videos_group_facebook {
             (ajaxpipe_token, async_get_token) = Helper.GetToken (html);
 
             Download: ;
-            var downloadTasks = Regex.Matches (html, "href=\"(?<urlPost>.*?)\" rel=\"async\"")
-                .Select (i => {
-                    return Task.Run (() => {
-                        var urlPost = $"https://fb.com{i.Groups["urlPost"].Value}";
-                        Console.WriteLine ($"Enter post: {urlPost}");
-                        Helper.DownloadVideo (urlPost);
-                    });
-                }).ToArray ();
-            Task.WaitAll (downloadTasks);
+            // Regex.Matches (html, "href=\"(?<urlPost>.*?)\" rel=\"async\"")
+            //     .Select (i => $"https://fb.com{i.Groups["urlPost"].Value}").ToList ()
+            //     .ForEach (urlPost => {
+            //         Console.WriteLine ($"Enter post: {urlPost}");
+            //         Helper.DownloadVideo (urlPost);
+            //     });
+
+            var urlPosts = Regex.Matches (html, "href=\"(?<urlPost>.*?)\" rel=\"async\"")
+                .Select (i => $"https://fb.com{i.Groups["urlPost"].Value}").ToList ();
+
+            Helper.DownloadVideos (urlPosts);
 
             var scroll_load = Helper.GetScroll_load (html);
-            url = $"https://www.facebook.com/ajax/pagelet/generic.php/GroupPhotosetPagelet?fb_dtsg_ag={async_get_token}&ajaxpipe=1&ajaxpipe_token={ajaxpipe_token}&no_script_path=1&data={WebUtility.UrlEncode(scroll_load)}&__user={userid}&__a=1&__csr=&__req=fetchstream_1&__beoa=0&__pc=PHASED:DEFAULT&dpr=1&__s=nvzl6z:zb6vnm:tueia0&__comet_req=0&jazoest=27866&__spin_r={spin_r}&__spin_b={spin_b}&__spin_t={spin_t}&__adt=1&ajaxpipe_fetch_stream=1";
-            html = Helper.GetHTML (url);
-
-            goto Download;
+            if (string.IsNullOrEmpty (scroll_load)) File.WriteAllText ("html.txt", html);
+            else {
+                url = $"https://www.facebook.com/ajax/pagelet/generic.php/GroupPhotosetPagelet?fb_dtsg_ag={async_get_token}&ajaxpipe=1&ajaxpipe_token={ajaxpipe_token}&no_script_path=1&data={WebUtility.UrlEncode(scroll_load)}&__user={userid}&__a=1&__csr=&__req=fetchstream_1&__beoa=0&__pc=PHASED:DEFAULT&dpr=1&__s=nvzl6z:zb6vnm:tueia0&__comet_req=0&jazoest=27866&__spin_r={spin_r}&__spin_b={spin_b}&__spin_t={spin_t}&__adt=1&ajaxpipe_fetch_stream=1";
+                html = Helper.GetHTML (url);
+                goto Download;
+            }
         }
     }
 }

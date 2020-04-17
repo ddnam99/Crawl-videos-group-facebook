@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -31,13 +32,29 @@ namespace Crawl_videos_group_facebook {
 
             return scroll_load;
         }
+        public static void DownloadVideos (List<string> urlPosts) {
+            if (urlPosts.Count > 10) {
+                var downloadTask1 = new Task (() => DownloadVideos (urlPosts.GetRange (0, urlPosts.Count / 2)));
+                var downloadTask2 = new Task (() => DownloadVideos (urlPosts.GetRange (urlPosts.Count / 2, urlPosts.Count - urlPosts.Count / 2)));
 
+                downloadTask1.Start ();
+                downloadTask2.Start ();
+                Task.WaitAll (downloadTask1, downloadTask2);
+
+                return;
+            }
+
+            urlPosts.ForEach (urlPost => {
+                Console.WriteLine ($"Enter post: {urlPost}");
+                Helper.DownloadVideo (urlPost);
+            });
+        }
         public static void DownloadVideo (string urlPost) {
             try {
                 var html = GetHTML (urlPost);
-                var downloadTasks = Regex.Matches (html, "hd_src:\"(?<src>.*?)\"", RegexOptions.Singleline)
-                    .Select (i => Task.Run (() => {
-                        var src = i.Groups["src"].Value;
+                Regex.Matches (html, "hd_src:\"(?<src>.*?)\"", RegexOptions.Singleline)
+                    .Select (i => i.Groups["src"].Value).ToList ()
+                    .ForEach (src => {
                         if (string.IsNullOrEmpty (src)) src = Regex.Match (html, "sd_src:\"(?<src>.*?)\"", RegexOptions.Singleline).Groups["src"].Value;
                         var filename = GetFilename (src);
                         var filePath = $"{Environment.videosPath}/{filename}";
@@ -46,8 +63,7 @@ namespace Crawl_videos_group_facebook {
                             Console.WriteLine ($"Download: {filename}");
                             new WebClient ().DownloadFile (src, filePath);
                         }
-                    })).ToArray ();
-                Task.WaitAll (downloadTasks);
+                    });
             } catch {
                 Console.WriteLine ($"Error: {urlPost}");
             }
