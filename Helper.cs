@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using RestSharp;
 
-namespace Crawl_videos_group_facebook.Models {
+namespace Crawl_videos_group_facebook {
     public static class Helper {
         public static string GetHTML (string url) {
             var client = new RestClient (url);
@@ -28,7 +28,7 @@ namespace Crawl_videos_group_facebook.Models {
             var pattern = "GroupPhotosetPagelet\",({\"scroll_load\"|{scroll_load:)(.*?),{";
             var groupPhotosetPagelet = Regex.Match (html, pattern, RegexOptions.Singleline).Value;
             var scroll_load = Regex.Match (groupPhotosetPagelet, ",(?<scroll_load>.*?),{", RegexOptions.Singleline).Groups["scroll_load"].Value;
-            
+
             return scroll_load;
         }
 

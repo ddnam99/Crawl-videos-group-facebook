@@ -8,26 +8,26 @@ using System.Threading.Tasks;
 namespace Crawl_videos_group_facebook {
     class Program {
         #region Properties
-        private static string dataPath { get => Models.Environment.dataPath; }
+        private static string dataPath { get => Environment.dataPath; }
         private static string cookie {
-            get => Models.Environment.cookie;
-            set => Models.Environment.cookie = value;
+            get => Environment.cookie;
+            set => Environment.cookie = value;
         }
         private static string group {
-            get => Models.Environment.group;
+            get => Environment.group;
             set {
-                Models.Environment.group = value;
+                Environment.group = value;
                 if (!Directory.Exists (groupPath)) Directory.CreateDirectory (groupPath);
                 if (!Directory.Exists (videosPath)) Directory.CreateDirectory (videosPath);
             }
         }
 
-        private static string groupPath { get => Models.Environment.groupPath; }
-        private static string videosPath { get => Models.Environment.videosPath; }
-        private static string userid { get => Models.Environment.userid; }
-        private static string spin_r { get => Models.Environment.spin_r; }
-        public static string spin_b { get => Models.Environment.spin_b; }
-        public static string spin_t { get => Models.Environment.spin_t; }
+        private static string groupPath { get => Environment.groupPath; }
+        private static string videosPath { get => Environment.videosPath; }
+        private static string userid { get => Environment.userid; }
+        private static string spin_r { get => Environment.spin_r; }
+        public static string spin_b { get => Environment.spin_b; }
+        public static string spin_t { get => Environment.spin_t; }
         private static string ajaxpipe_token;
         private static string async_get_token;
         #endregion
@@ -45,9 +45,9 @@ namespace Crawl_videos_group_facebook {
             }
 
             var url = $"https://www.facebook.com/groups/{group}/videos";
-            var html = Models.Helper.GetHTML (url);
+            var html = Helper.GetHTML (url);
 
-            (ajaxpipe_token, async_get_token) = Models.Helper.GetToken (html);
+            (ajaxpipe_token, async_get_token) = Helper.GetToken (html);
 
             Download: ;
             var downloadTasks = Regex.Matches (html, "href=\"(?<urlPost>.*?)\" rel=\"async\"")
@@ -55,14 +55,14 @@ namespace Crawl_videos_group_facebook {
                     return Task.Run (() => {
                         var urlPost = $"https://fb.com{i.Groups["urlPost"].Value}";
                         Console.WriteLine ($"Enter post: {urlPost}");
-                        Models.Helper.DownloadVideo (urlPost);
+                        Helper.DownloadVideo (urlPost);
                     });
                 }).ToArray ();
             Task.WaitAll (downloadTasks);
 
-            var scroll_load = Models.Helper.GetScroll_load (html);
+            var scroll_load = Helper.GetScroll_load (html);
             url = $"https://www.facebook.com/ajax/pagelet/generic.php/GroupPhotosetPagelet?fb_dtsg_ag={async_get_token}&ajaxpipe=1&ajaxpipe_token={ajaxpipe_token}&no_script_path=1&data={WebUtility.UrlEncode(scroll_load)}&__user={userid}&__a=1&__csr=&__req=fetchstream_1&__beoa=0&__pc=PHASED:DEFAULT&dpr=1&__s=nvzl6z:zb6vnm:tueia0&__comet_req=0&jazoest=27866&__spin_r={spin_r}&__spin_b={spin_b}&__spin_t={spin_t}&__adt=1&ajaxpipe_fetch_stream=1";
-            html = Models.Helper.GetHTML (url);
+            html = Helper.GetHTML (url);
 
             goto Download;
         }
