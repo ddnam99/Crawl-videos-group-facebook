@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Crawl_videos_group_facebook {
     class Program {
@@ -15,11 +15,7 @@ namespace Crawl_videos_group_facebook {
         }
         private static string group {
             get => Environment.group;
-            set {
-                Environment.group = value;
-                if (!Directory.Exists (groupPath)) Directory.CreateDirectory (groupPath);
-                if (!Directory.Exists (videosPath)) Directory.CreateDirectory (videosPath);
-            }
+            set => Environment.group = value;
         }
 
         private static string groupPath { get => Environment.groupPath; }
@@ -36,13 +32,58 @@ namespace Crawl_videos_group_facebook {
             if (!Directory.Exists (dataPath))
                 Directory.CreateDirectory (dataPath);
 
-            //Console.Write ("Group: ");
-            //group = Console.ReadLine ();
-            group = "gaixinhchonloc";
             if (string.IsNullOrEmpty (cookie)) {
                 Console.Write ("Cookie: ");
                 cookie = Console.ReadLine ();
             }
+
+            while (true) {
+                Console.Write ("> ");
+                var command = Console.ReadLine ().Split (' ');
+                try {
+                    switch (command[0]) {
+                        case "download":
+                            Console.WriteLine ($"Download videos group: {command[1]}...");
+                            DownloadVideos (command[1]);
+                            break;
+                        case "update":
+                            Directory.GetDirectories (dataPath).ToList ().ForEach (dir => {
+                                var groupDir = dir.Substring (dir.LastIndexOf ("/") + 1);
+                                Console.WriteLine ($"Update videos group: {groupDir}...");
+                                DownloadVideos (group);
+                            });
+                            break;
+                        case "open":
+                            if (command.Length == 1) {
+                                Directory.GetDirectories (dataPath).ToList ().ForEach (dir => {
+                                    var groupDir = dir.Substring (dir.LastIndexOf ("/") + 1);
+                                    Console.WriteLine (groupDir);
+                                });
+                                break;
+                            }
+
+                            if (!Directory.Exists ($"{dataPath}/{command[1]}"))
+                                throw new Exception ("Directory not exist!");
+
+                            OpenFolder ($"{dataPath}/{command[1]}/videos");
+                            break;
+                        default:
+                            Console.WriteLine ("unknown!");
+                            break;
+                    }
+                } catch (Exception e) {
+                    Console.WriteLine ($"Error: {e.Message}");
+                }
+            }
+        }
+
+        private static void OpenFolder (string path) {
+            Process.Start ("zsh", $"-c \"xdg-open {path}\"");
+        }
+        private static void DownloadVideos (string group) {
+            Program.group = group;
+            if (!Directory.Exists (groupPath)) Directory.CreateDirectory (groupPath);
+            if (!Directory.Exists (videosPath)) Directory.CreateDirectory (videosPath);
 
             var url = $"https://www.facebook.com/groups/{group}/videos";
             var html = Helper.GetHTML (url);
