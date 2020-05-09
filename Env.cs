@@ -2,7 +2,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 
 namespace Crawl_videos_group_facebook {
-    public static class Environment {
+    public static class Env {
         public static string dataPath { get => "./data"; }
         public static string cookie {
             get {
@@ -14,7 +14,7 @@ namespace Crawl_videos_group_facebook {
         }
         public static string group { get; set; }
 
-        public static string groupPath => $"{Environment.dataPath}/{group}";
+        public static string groupPath => $"{Env.dataPath}/{group}";
         public static string videosPath => $"{groupPath}/videos";
         public static string userid {
             get => Regex.Match (cookie, "c_user=(?<id>.*?);", RegexOptions.Singleline).Groups["id"].Value;

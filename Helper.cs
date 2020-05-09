@@ -12,7 +12,7 @@ namespace Crawl_videos_group_facebook {
         public static string GetHTML (string url) {
             var client = new RestClient (url);
             var request = new RestRequest (Method.GET);
-            request.AddHeader ("cookie", Environment.cookie);
+            request.AddHeader ("cookie", Env.cookie);
             IRestResponse response = client.Execute (request);
 
             return response.Content.Replace ("\\", "");
@@ -57,7 +57,7 @@ namespace Crawl_videos_group_facebook {
                     .ForEach (src => {
                         if (string.IsNullOrEmpty (src)) src = Regex.Match (html, "sd_src:\"(?<src>.*?)\"", RegexOptions.Singleline).Groups["src"].Value;
                         var filename = GetFilename (src);
-                        var filePath = $"{Environment.videosPath}/{filename}";
+                        var filePath = $"{Env.videosPath}/{filename}";
                         if (File.Exists (filePath)) Console.WriteLine ($"Skip: {urlPost}");
                         else {
                             Console.WriteLine ($"Download: {filename}");

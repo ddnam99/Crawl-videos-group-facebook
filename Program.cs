@@ -8,22 +8,22 @@ using System.Text.RegularExpressions;
 namespace Crawl_videos_group_facebook {
     class Program {
         #region Properties
-        private static string dataPath { get => Environment.dataPath; }
+        private static string dataPath { get => Env.dataPath; }
         private static string cookie {
-            get => Environment.cookie;
-            set => Environment.cookie = value;
+            get => Env.cookie;
+            set => Env.cookie = value;
         }
         private static string group {
-            get => Environment.group;
-            set => Environment.group = value;
+            get => Env.group;
+            set => Env.group = value;
         }
 
-        private static string groupPath { get => Environment.groupPath; }
-        private static string videosPath { get => Environment.videosPath; }
-        private static string userid { get => Environment.userid; }
-        private static string spin_r { get => Environment.spin_r; }
-        public static string spin_b { get => Environment.spin_b; }
-        public static string spin_t { get => Environment.spin_t; }
+        private static string groupPath { get => Env.groupPath; }
+        private static string videosPath { get => Env.videosPath; }
+        private static string userid { get => Env.userid; }
+        private static string spin_r { get => Env.spin_r; }
+        public static string spin_b { get => Env.spin_b; }
+        public static string spin_t { get => Env.spin_t; }
         private static string ajaxpipe_token;
         private static string async_get_token;
         #endregion
